@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Future of AI &amp; HPC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:oklch(0.16 0.014 260); --bg-2:oklch(0.20 0.017 260); --sidebar-bg:oklch(0.12 0.012 260);
+  --ink:oklch(0.96 0.006 260); --ink-dim:oklch(0.72 0.012 260); --ink-dimmer:oklch(0.52 0.014 260);
+  --accent:oklch(0.78 0.14 195); --accent-2:oklch(0.72 0.16 40); --line:oklch(0.32 0.016 260);
+  --shadow:0 18px 45px rgba(0,0,0,0.45); --radius:4px;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{margin:0;font-family:'IBM Plex Sans',sans-serif;color:var(--ink);background:var(--bg);overflow:hidden;}
+.headline{font-family:'Space Grotesk',sans-serif;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+a{color:var(--accent-2);}
+button{font:inherit;}
+.app{position:fixed;inset:0;display:grid;grid-template-columns:300px 1fr;height:100%;overflow:hidden;}
+.sidebar{border-right:1px solid var(--line);background:var(--sidebar-bg);padding:20px 16px;display:flex;flex-direction:column;gap:16px;min-width:0;overflow:hidden;}
+.brand{display:grid;gap:5px;padding:4px 6px 14px;border-bottom:1px solid var(--line);}
+.brand strong{font-size:1rem;font-family:'Space Grotesk',sans-serif;}
+.brand span{color:var(--ink-dimmer);font-size:0.8rem;line-height:1.35;}
+.controls{display:grid;gap:10px;padding:0 6px;}
+.progress-wrap{display:grid;gap:6px;}
+.progress-label{display:flex;justify-content:space-between;font-size:0.78rem;color:var(--ink-dimmer);}
+.progress{height:6px;border-radius:999px;background:var(--bg-2);overflow:hidden;}
+.bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width 160ms ease;}
+.nav-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.icon-btn{border:1px solid var(--line);background:var(--bg-2);color:var(--ink);border-radius:var(--radius);padding:8px 10px;cursor:pointer;min-height:36px;}
+.icon-btn:hover{border-color:var(--accent);}
+.timer{display:inline-grid;place-items:center;min-width:62px;border:1px solid var(--line);border-radius:var(--radius);background:var(--bg-2);padding:4px 8px;font-variant-numeric:tabular-nums;font-size:0.8rem;}
+.outline{overflow:auto;overscroll-behavior:contain;display:grid;gap:4px;}
+.outline button{width:100%;border:0;background:transparent;color:var(--ink-dimmer);text-align:left;padding:9px 10px;border-radius:var(--radius);cursor:pointer;line-height:1.3;display:grid;grid-template-columns:28px 1fr;gap:6px;align-items:baseline;}
+.outline button:hover{background:var(--bg-2);color:var(--ink);}
+.outline button.active{background:color-mix(in oklch,var(--accent) 16%,transparent);color:var(--ink);}
+.outline .n{font-variant-numeric:tabular-nums;font-size:0.76rem;font-family:'IBM Plex Mono',monospace;}
+.outline .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:0.86rem;}
+.stage{position:relative;min-width:0;height:100%;display:grid;grid-template-rows:1fr auto;overflow:hidden;}
+#slides{min-width:0;min-height:0;height:100%;position:relative;overflow:hidden;}
+.slide{display:none;width:1920px;height:1080px;position:absolute;left:50%;top:50%;transform-origin:center center;box-shadow:var(--shadow);}
+.slide.active{display:block;animation:fade 160ms ease-out;}
+@keyframes fade{from{opacity:0.4;}to{opacity:1;}}
+.footer{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:8px 24px 16px;color:var(--ink-dimmer);font-size:0.82rem;}
+.kbd{border:1px solid var(--line);background:var(--bg-2);border-radius:5px;padding:2px 6px;color:var(--ink);}
+.notes{display:none;position:fixed;right:20px;bottom:60px;width:min(520px,calc(100vw - 40px));max-height:42vh;overflow:auto;background:var(--bg-2);color:var(--ink);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line);padding:16px 18px;z-index:20;}
+.notes.open{display:block;}
+.notes h3{margin:0 0 8px;font-family:'Space Grotesk',sans-serif;font-size:1rem;color:var(--accent);}
+.notes p{font-size:0.92rem;line-height:1.5;color:var(--ink-dim);margin:0;}
+.preview-trigger{position:relative;display:inline-block;}
+.preview-img{display:none;position:absolute;bottom:calc(100% + 10px);left:0;width:230px;padding:6px;background:var(--bg-2);border:1px solid var(--line);border-radius:6px;box-shadow:0 16px 32px rgba(0,0,0,0.45);z-index:30;pointer-events:none;}
+.preview-img img{width:100%;height:auto;border-radius:3px;display:block;}
+.preview-trigger:hover .preview-img{display:block;}
+.flip-inner{position:relative;width:100%;height:100%;}
+.flip-face{position:relative;width:100%;height:100%;transition:transform 0.3s ease,opacity 0.22s ease;transform:scaleX(1);opacity:1;transition-delay:0.22s;}
+.flip-back{position:absolute;inset:0;transform:scaleX(0);opacity:0;pointer-events:none;transition-delay:0s;}
+.flip-outer:hover .flip-face:not(.flip-back){transform:scaleX(0);opacity:0;transition-delay:0s;}
+.flip-outer:hover .flip-back{transform:scaleX(1);opacity:1;transition-delay:0.22s;pointer-events:auto;}
+.logo-chip{position:absolute;border-radius:14px;box-shadow:0 14px 30px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;padding:14px;}
+.logo-chip img{max-width:100%;max-height:100%;object-fit:contain;display:block;}
+@media print{
+  body{overflow:visible;}
+  .app{display:block;}
+  .sidebar,.footer,.notes{display:none!important;}
+  .slide{display:block!important;position:relative;left:auto;top:auto;transform:none!important;page-break-after:always;box-shadow:none;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <strong>Future of AI &amp; HPC</strong>
+      <span>Pietro Morichetti — HPC, AI infrastructure, and the resource constraints ahead.</span>
+    </div>
+    <div class="controls">
+      <div class="progress-wrap">
+        <div class="progress-label"><span id="where">Slide 1</span><span class="timer" id="clock">00:00</span></div>
+        <div class="progress"><div class="bar" id="bar"></div></div>
+      </div>
+      <div class="nav-buttons">
+        <button class="icon-btn" id="prev" title="Previous slide">← Prev</button>
+        <button class="icon-btn" id="next" title="Next slide">Next →</button>
+      </div>
+      <button class="icon-btn" id="notesBtn" title="Toggle presenter notes">Presenter notes</button>
+    </div>
+    <nav class="outline" id="outline" aria-label="Slide outline"></nav>
+  </aside>
+
+  <main class="stage">
+    <section id="slides">
+
+      <div class="slide" data-title="What is HPC, and why is everyone building it?" data-notes="Frontier AI training runs on HPC-architected infrastructure, delivered through a cloud-style business model. It borrows HPC's tightly-coupled, high-bandwidth design principles, but borrows cloud's economics — rented, elastic, provider-operated capacity — rather than being built and owned like a traditional national supercomputer.">
+        <div style="width:1920px;height:1080px;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;padding:96px 110px 88px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:-180px;right:-180px;width:640px;height:640px;border-radius:50%;border:1px solid var(--line);"></div>
+          <div style="position:absolute;top:-40px;right:-40px;width:340px;height:340px;border-radius:50%;border:1px solid var(--accent);opacity:0.35;"></div>
+
+          <div class="mono" style="font-size:26px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;">Future of AI &amp; HPC — 01 | Pietro Morichetti</div>
+
+          <h1 class="headline" style="font-size:76px;font-weight:700;line-height:1.05;margin:48px 0 0;max-width:1500px;">
+            What is <span style="color:var(--accent);">High-Performance Computing</span>, and why is everyone building it?
+          </h1>
+
+          <p style="font-size:30px;color:var(--ink-dim);line-height:1.5;max-width:1180px;margin:36px 0 0;">
+            HPC clusters thousands of processors to run calculations far beyond what a single machine can handle — the foundation both of decades of scientific research and of today's AI boom.
+          </p>
+
+          <div style="display:flex;gap:40px;margin-top:64px;">
+            <div style="flex:1;" class="flip-outer">
+              <div class="flip-inner">
+                <div class="flip-face" style="background:var(--bg-2);border:1px solid var(--line);border-radius:4px;padding:44px 40px;">
+                  <div style="width:22px;height:22px;border:3px solid var(--accent);transform:rotate(45deg);margin-bottom:28px;"></div>
+                  <div class="headline" style="font-size:40px;font-weight:600;">Scientific research</div>
+                  <div style="font-size:24px;color:var(--ink-dim);margin-top:16px;line-height:1.5;"><u>Exascale race</u><br>China's LineShine hit 2.2 exaflops in 2026, passing the US's El Capitan — the first non-US #1 since 2017<br><u>Europe's flagship</u><br>JUPITER (Jülich, Germany) is the EU's first exascale system, built for climate and materials research (<a href="https://top500.org/lists/top500/2026/06/" target="_blank" rel="noopener">TOP500</a>)</div>
+                </div>
+                <div class="flip-face flip-back" style="background:var(--bg-2);border:1px solid var(--line);border-radius:4px;padding:32px 30px;overflow:hidden;display:flex;flex-direction:column;">
+                  <div style="position:relative;flex:1;">
+                    <div class="logo-chip" style="top:3%;left:3%;width:27.33%;height:44%;transform:rotate(-5deg);background:white;"><img src="uploads/secured.png" alt="SECURED EU Project"></div>
+                    <div class="logo-chip" style="top:3%;left:36.33%;width:27.33%;height:44%;transform:rotate(4deg);background:oklch(0.24 0.016 260);"><img src="uploads/neardata.png" alt="NEARDATA"></div>
+                    <div class="logo-chip" style="top:3%;left:69.67%;width:27.33%;height:44%;transform:rotate(3deg);background:white;"><img src="uploads/graphcast.png" alt="GraphCast"></div>
+                    <div class="logo-chip" style="top:53%;left:3%;width:27.33%;height:44%;transform:rotate(-4deg);background:white;"><img src="uploads/black_forest_labs.png" alt="Black Forest Labs"></div>
+                    <div class="logo-chip" style="top:53%;left:36.33%;width:27.33%;height:44%;transform:rotate(2deg);background:white;"><img src="uploads/Destination_Earth_pillars.jpg" alt="Destination Earth"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="flex:1;" class="flip-outer">
+              <div class="flip-inner">
+                <div class="flip-face" style="background:var(--bg-2);border:1px solid var(--line);border-radius:4px;padding:44px 40px;">
+                  <div style="width:22px;height:22px;border-radius:50%;border:3px solid var(--accent);margin-bottom:28px;"></div>
+                  <div class="headline" style="font-size:40px;font-weight:600;">AI training</div>
+                  <div style="font-size:24px;color:var(--ink-dim);margin-top:16px;line-height:1.5;">Large language models are trained on HPC-class GPU clusters — the same infrastructure once reserved for national labs.</div>
+                </div>
+                <div class="flip-face flip-back" style="background:var(--bg-2);border:1px solid var(--line);border-radius:4px;padding:32px 30px;overflow:hidden;display:flex;flex-direction:column;">
+                  <div style="position:relative;flex:1;">
+                    <div class="logo-chip" style="top:3%;left:3%;width:44%;height:44%;transform:rotate(-5deg);background:white;"><img src="uploads/deepseek.png" alt="DeepSeek"></div>
+                    <div class="logo-chip" style="top:3%;left:53%;width:44%;height:44%;transform:rotate(4deg);background:white;"><img src="uploads/gemini.jpeg" alt="Gemini"></div>
+                    <div class="logo-chip" style="top:53%;left:3%;width:44%;height:44%;transform:rotate(3deg);background:white;"><img src="uploads/claude.png" alt="Claude"></div>
+                    <div class="logo-chip" style="top:53%;left:53%;width:44%;height:44%;transform:rotate(-4deg);background:white;"><img src="uploads/openai.png" alt="OpenAI"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="flex:1.15;" class="flip-outer">
+              <div class="flip-inner">
+                <div class="flip-face" style="background:linear-gradient(135deg,oklch(0.30 0.06 195),oklch(0.22 0.03 220));border-radius:4px;padding:44px 40px;">
+                  <div class="mono" style="font-size:24px;color:var(--ink);opacity:0.85;letter-spacing:0.06em;text-transform:uppercase;">Europe's answer</div>
+                  <div class="headline" style="font-size:56px;font-weight:700;margin-top:18px;color:white;">AI Factories</div>
+                  <div style="font-size:26px;color:var(--ink);opacity:0.92;margin-top:16px;line-height:1.5;">19 EuroHPC AI Factories + 13 Antennas give startups and SMEs free access to AI-optimised supercomputers — a €10B bet on keeping Europe competitive.</div>
+                </div>
+                <div class="flip-face flip-back" style="background:linear-gradient(135deg,oklch(0.30 0.06 195),oklch(0.22 0.03 220));border-radius:4px;padding:32px 30px;overflow:hidden;display:flex;flex-direction:column;">
+                  <div class="mono" style="font-size:13px;color:var(--ink);opacity:0.85;letter-spacing:0.1em;text-transform:uppercase;flex-shrink:0;">EuroHPC network</div>
+                  <div style="position:relative;flex:1;margin-top:14px;">
+                    <div class="logo-chip" style="top:3%;left:3%;width:27.33%;height:44%;transform:rotate(-5deg);background:white;"><img src="uploads/alice_recoque.png" alt="ALICE Recoque"></div>
+                    <div class="logo-chip" style="top:3%;left:36.33%;width:27.33%;height:44%;transform:rotate(4deg);background:white;"><img src="uploads/leonardo.png" alt="Leonardo — CINECA"></div>
+                    <div class="logo-chip" style="top:3%;left:69.67%;width:27.33%;height:44%;transform:rotate(3deg);background:white;"><img src="uploads/julich.jpeg" alt="Jülich Supercomputing Centre"></div>
+                    <div class="logo-chip" style="top:53%;left:3%;width:27.33%;height:44%;transform:rotate(-4deg);background:white;"><img src="uploads/bsc.png" alt="Barcelona Supercomputing Center"></div>
+                    <div class="logo-chip" style="top:53%;left:36.33%;width:27.33%;height:44%;transform:rotate(2deg);background:white;"><img src="uploads/lumi.png" alt="LUMI"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide" data-title="A worldwide revolution is reshaping companies, jobs, and states" data-notes="">
+        <div style="width:1920px;height:1080px;background:var(--ink);color:var(--bg);display:flex;flex-direction:column;padding:96px 110px 88px;position:relative;overflow:hidden;">
+          <div class="mono" style="font-size:26px;color:oklch(0.5 0.12 40);letter-spacing:0.12em;text-transform:uppercase;">Future of AI &amp; HPC — 02 | Pietro Morichetti</div>
+
+          <h1 class="headline" style="font-size:76px;font-weight:700;line-height:1.05;margin:48px 0 0;max-width:1600px;">
+            A worldwide revolution is reshaping companies, jobs, and states
+          </h1>
+
+          <div style="display:flex;flex-direction:column;gap:14px;margin-top:34px;flex:1;min-height:0;">
+            <div style="display:flex;gap:40px;flex-shrink:0;">
+              <div style="flex:1;border-top:4px solid var(--accent-2);padding-top:14px;display:flex;flex-direction:column;">
+                <div class="headline" style="font-size:40px;font-weight:600;">New industry giants</div>
+                <div style="font-size:24px;color:oklch(0.4 0.014 260);margin-top:8px;line-height:1.35;">Anthropic and OpenAI became industry-defining companies in a few years, built around large language models — DeepSeek shows the race is global.</div>
+                <div style="margin-top:12px;display:flex;align-items:baseline;gap:18px;">
+                  <div class="headline" style="font-size:58px;font-weight:700;color:var(--accent-2);white-space:nowrap;">$725B</div>
+                  <div style="font-size:24px;color:oklch(0.4 0.014 260);line-height:1.3;">cloud AI-infrastructure spending planned for 2026 by <a href="https://finance.yahoo.com/sectors/technology/article/meta-microsoft-amazon-and-alphabet-are-about-to-spend-a-shocking-amount-of-money-to-dominate-the-ai-era-115359575.html" target="_blank" rel="noopener">Amazon, Google, Meta and Microsoft</a> — up 77% from 2025</div>
+                </div>
+                <div style="margin-top:6px;font-size:18px;color:oklch(0.5 0.014 260);line-height:1.3;">Forecasts agree it keeps growing: <a href="https://www.technavio.com/report/high-performance-computing-hpc-for-ai-market-industry-analysis" target="_blank" rel="noopener">+$147B by 2030</a> (Technavio), <a href="https://www.snsinsider.com/reports/ai-enhanced-hpc-market-8350" target="_blank" rel="noopener">roughly double again by 2032</a> (SNS Insider)</div>
+              </div>
+              <div style="flex:1;border-top:4px solid var(--accent-2);padding-top:14px;display:flex;flex-direction:column;">
+                <div class="headline" style="font-size:40px;font-weight:600;">A matter of national security</div>
+                <div style="font-size:24px;color:oklch(0.4 0.014 260);margin-top:8px;line-height:1.35;">The US treats AI compute as critical infrastructure tied to military and economic superiority — ranked by <a href="https://www.belfercenter.org/publication/artificial-intelligence-and-national-security" target="_blank" rel="noopener">Harvard's Belfer Center</a> alongside nuclear, aerospace, and biotech.</div>
+                <div style="margin-top:12px;display:flex;align-items:baseline;gap:18px;">
+                  <div class="headline" style="font-size:25px;font-weight:700;color:var(--bg);white-space:nowrap;">US restricts, EU builds</div>
+                  <div style="font-size:24px;color:oklch(0.4 0.014 260);line-height:1.3;">Europe has no equivalent designation yet — still building the HPC capacity to compete</div>
+                </div>
+                <div style="margin-top:6px;font-size:18px;color:oklch(0.5 0.014 260);line-height:1.3;">China is weighing the same move, discussing curbs on overseas access to its top models — <a href="https://time.com/article/2026/07/07/china-ai-models-alibaba-bytedance/" target="_blank" rel="noopener">treating frontier AI as a strategic asset</a></div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:40px;flex:1;min-height:0;border-top:4px solid var(--accent-2);padding-top:14px;overflow:hidden;">
+              <div style="flex:1;display:flex;flex-direction:column;">
+                <div class="headline" style="font-size:36px;font-weight:600;">Capability outpaces adoption</div>
+                <div style="font-size:23px;color:oklch(0.4 0.014 260);margin-top:6px;line-height:1.35;max-width:900px;width:900px;height:86px;">What LLMs can already do outpaces how much they're actually used — especially in white-collar roles. <span style="font-size:18px;color:oklch(0.5 0.014 260);"><a href="https://www.anthropic.com/research/labor-market-impacts" target="_blank" rel="noopener">Anthropic Economic Index, "Labor market impacts of AI"</a></span></div>
+                <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+                  <div style="display:flex;align-items:center;gap:14px;">
+                    <div style="width:168px;font-size:19px;color:var(--bg);flex-shrink:0;">Computer &amp; math</div>
+                    <div style="width:320px;flex-shrink:0;position:relative;height:13px;background:rgba(0,0,0,0.1);border-radius:3px;">
+                      <div style="position:absolute;left:0;top:0;height:100%;width:94%;background:oklch(0.4 0.014 260);opacity:0.3;border-radius:3px;"></div>
+                      <div style="position:absolute;left:0;top:0;height:100%;width:36%;background:var(--accent-2);border-radius:3px;"></div>
+                    </div>
+                    <div style="width:128px;font-size:17px;color:oklch(0.4 0.014 260);text-align:right;flex-shrink:0;">94% → 36%</div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:14px;">
+                    <div style="width:168px;font-size:19px;color:var(--bg);flex-shrink:0;">Office &amp; admin</div>
+                    <div style="width:320px;flex-shrink:0;position:relative;height:13px;background:rgba(0,0,0,0.1);border-radius:3px;">
+                      <div style="position:absolute;left:0;top:0;height:100%;width:90%;background:oklch(0.4 0.014 260);opacity:0.3;border-radius:3px;"></div>
+                      <div style="position:absolute;left:0;top:0;height:100%;width:34%;background:var(--accent-2);border-radius:3px;"></div>
+                    </div>
+                    <div style="width:128px;font-size:17px;color:oklch(0.4 0.014 260);text-align:right;flex-shrink:0;">90% → 34%</div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:14px;">
+                    <div style="width:168px;font-size:19px;color:var(--bg);flex-shrink:0;">Business &amp; finance</div>
+                    <div style="width:320px;flex-shrink:0;position:relative;height:13px;background:rgba(0,0,0,0.1);border-radius:3px;">
+                      <div style="position:absolute;left:0;top:0;height:100%;width:94%;background:oklch(0.4 0.014 260);opacity:0.3;border-radius:3px;"></div>
+                      <div style="position:absolute;left:0;top:0;height:100%;width:28%;background:var(--accent-2);border-radius:3px;"></div>
+                    </div>
+                    <div style="width:128px;font-size:17px;color:oklch(0.4 0.014 260);text-align:right;flex-shrink:0;">94% → 28%</div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:14px;">
+                    <div style="width:168px;font-size:19px;color:var(--bg);flex-shrink:0;">Legal</div>
+                    <div style="width:320px;flex-shrink:0;position:relative;height:13px;background:rgba(0,0,0,0.1);border-radius:3px;">
+                      <div style="position:absolute;left:0;top:0;height:100%;width:89%;background:oklch(0.4 0.014 260);opacity:0.3;border-radius:3px;"></div>
+                      <div style="position:absolute;left:0;top:0;height:100%;width:20%;background:var(--accent-2);border-radius:3px;"></div>
+                    </div>
+                    <div style="width:128px;font-size:17px;color:oklch(0.4 0.014 260);text-align:right;flex-shrink:0;">89% → 20%</div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:20px;margin-top:8px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><div style="width:11px;height:11px;border-radius:2px;background:oklch(0.4 0.014 260);opacity:0.3;"></div><div style="font-size:16px;color:oklch(0.4 0.014 260);">Theoretical capability</div></div>
+                  <div style="display:flex;align-items:center;gap:7px;"><div style="width:11px;height:11px;border-radius:2px;background:var(--accent-2);"></div><div style="font-size:16px;color:oklch(0.4 0.014 260);">Observed on-the-job use</div></div>
+                </div>
+              </div>
+
+              <div style="flex:1;display:flex;flex-direction:column;">
+                <div class="headline" style="font-size:36px;font-weight:600;">Entry-level hiring falls first</div>
+                <div style="font-size:23px;color:oklch(0.4 0.014 260);margin-top:6px;line-height:1.35;max-width:650px;">Entry-level headcount across occupations, indexed by age — since generative AI went mainstream.</div>
+                <svg viewBox="0 0 340 130" preserveAspectRatio="none" style="width:100%;height:62px;margin-top:6px;overflow:visible;display:block;flex-shrink:0;">
+                  <line x1="0" y1="115" x2="340" y2="115" stroke="oklch(0.4 0.014 260)" stroke-opacity="0.25" stroke-width="1"></line>
+                  <line x1="0" y1="10" x2="0" y2="115" stroke="oklch(0.4 0.014 260)" stroke-opacity="0.15" stroke-width="1"></line>
+                  <line x1="85" y1="10" x2="85" y2="115" stroke="oklch(0.4 0.014 260)" stroke-opacity="0.15" stroke-width="1"></line>
+                  <line x1="170" y1="10" x2="170" y2="115" stroke="oklch(0.4 0.014 260)" stroke-opacity="0.15" stroke-width="1"></line>
+                  <line x1="255" y1="10" x2="255" y2="115" stroke="oklch(0.4 0.014 260)" stroke-opacity="0.15" stroke-width="1"></line>
+                  <line x1="340" y1="10" x2="340" y2="115" stroke="oklch(0.4 0.014 260)" stroke-opacity="0.15" stroke-width="1"></line>
+                  <polyline points="0,45 85,43 170,58 255,80 340,92" fill="none" stroke="var(--accent-2)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                  <polyline points="0,45 85,42 170,36 255,26 340,14" fill="none" stroke="oklch(0.4 0.014 260)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.55"></polyline>
+                  <circle cx="340" cy="92" r="5" fill="var(--accent-2)"></circle>
+                  <circle cx="340" cy="14" r="5" fill="oklch(0.4 0.014 260)" fill-opacity="0.55"></circle>
+                </svg>
+                <div style="display:flex;font-size:17px;color:oklch(0.5 0.014 260);margin-top:2px;position:relative;height:20px;flex-shrink:0;">
+                  <div style="position:absolute;left:0%;transform:translateX(-2px);">2021</div>
+                  <div style="position:absolute;left:25%;transform:translateX(-50%);">2022</div>
+                  <div style="position:absolute;left:50%;transform:translateX(-50%);">2023</div>
+                  <div style="position:absolute;left:75%;transform:translateX(-50%);">2024</div>
+                  <div style="position:absolute;left:100%;transform:translateX(calc(-100% + 2px));">2025</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:20px;margin-top:6px;flex-shrink:0;">
+                  <div style="display:flex;align-items:center;gap:7px;"><div style="width:11px;height:11px;border-radius:50%;background:var(--accent-2);"></div><div style="font-size:16px;color:oklch(0.4 0.014 260);">Early career, 22–25</div></div>
+                  <div style="display:flex;align-items:center;gap:7px;"><div style="width:11px;height:11px;border-radius:50%;background:oklch(0.4 0.014 260);opacity:0.55;"></div><div style="font-size:16px;color:oklch(0.4 0.014 260);">Experienced, 35–49</div></div>
+                </div>
+                <div style="margin-top:6px;font-size:18px;color:oklch(0.5 0.014 260);flex-shrink:0;"><a href="https://www.linkedin.com/top-content/workplace-trends/job-market-trends-insights/reasons-entry-level-jobs-are-becoming-scarce/" target="_blank" rel="noopener">Stanford Digital Economy Lab — Brynjolfsson, Chandar &amp; Chen, "Canaries in the Coal Mine"</a></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide" data-title="The next constraint isn't ideas — it's resources" data-notes="">
+        <div style="width:1920px;height:1080px;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;padding:96px 110px 88px;position:relative;overflow:hidden;">
+          <div style="position:absolute;bottom:-220px;left:-160px;width:560px;height:560px;border-radius:50%;border:1px solid var(--line);"></div>
+
+          <div style="position:absolute;top:224px;right:110px;display:flex;flex-direction:column;align-items:flex-end;gap:10px;">
+            <div class="mono" style="font-size:13px;color:var(--ink-dimmer);text-transform:uppercase;letter-spacing:0.08em;">Also being explored</div>
+            <a href="https://dug.com/commentary-could-a-submerged-data-centre-lead-us-to-hpc-in-space/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:var(--bg-2);border:1px solid var(--line);border-radius:4px;padding:9px 16px;text-decoration:none;">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M1 7 Q4 4 7 7 T13 7 T19 7" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"></path><path d="M1 12 Q4 9 7 12 T13 12 T19 12" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" opacity="0.5"></path><path d="M1 17 Q4 14 7 17 T13 17 T19 17" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" opacity="0.25"></path></svg>
+              <span style="font-size:15px;color:var(--ink);">Data centers in the ocean</span>
+            </a>
+            <a href="https://orbital.inc/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:var(--bg-2);border:1px solid var(--line);border-radius:4px;padding:9px 16px;text-decoration:none;">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><ellipse cx="10" cy="10" rx="9" ry="3.4" stroke="var(--accent-2)" stroke-width="1.6" transform="rotate(-20 10 10)"></ellipse><circle cx="10" cy="10" r="2.6" fill="var(--accent-2)"></circle></svg>
+              <span style="font-size:15px;color:var(--ink);">Data centers in space</span>
+            </a>
+          </div>
+
+          <div class="mono" style="font-size:26px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;">Future of AI &amp; HPC — 03 | Pietro Morichetti</div>
+
+          <h1 class="headline" style="font-size:76px;font-weight:700;line-height:1.05;margin:48px 0 0;max-width:1500px;">
+            The next constraint isn't ideas — it's <span style="color:var(--accent);">resources</span>
+          </h1>
+
+          <div style="display:flex;gap:28px;margin-top:44px;">
+            <div style="flex:1;background:var(--bg-2);border:1px solid var(--line);border-radius:4px;padding:28px 26px;display:flex;flex-direction:column;">
+              <div style="font-size:22px;color:var(--ink-dimmer);text-transform:uppercase;letter-spacing:0.06em;">Water &amp; electricity</div>
+              <div class="headline" style="font-size:50px;font-weight:700;color:var(--accent);margin-top:10px;">176 TWh</div>
+              <div style="font-size:19px;color:var(--ink-dim);margin-top:8px;line-height:1.4;">4.4% of US electricity demand in 2023, plus 17.4B gallons of water — set to triple by 2028 (<a href="https://www.congress.gov/crs-product/R48646" target="_blank" rel="noopener">CRS</a>)</div>
+              <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-size:17px;color:var(--ink-dim);line-height:1.4;">One Meta data center takes 10% of a Georgia town's daily water — taps now run undrinkable (<span class="preview-trigger"><a href="https://ocasio-cortez.house.gov/media/press-releases/ocasio-cortez-presses-epa-assistant-administrator-kramer-jeopardizing-clean" target="_blank" rel="noopener">Rep. Ocasio-Cortez</a><span class="preview-img"><img src="uploads/compressedimage.jpeg" alt="Rep. Alexandria Ocasio-Cortez questioning the EPA about data center water use"></span></span>)</div>
+              <div style="margin-top:14px;padding:12px 14px;background:color-mix(in oklch,var(--accent) 15%,transparent);border-radius:4px;font-size:16px;color:var(--ink);line-height:1.4;"><strong style="color:var(--accent);">Industry response:</strong> NVIDIA's Rubin platform is 100% liquid-cooled — up to 100% less water in favorable climates (<a href="https://blogs.nvidia.com/blog/liquid-cooling-ai-factories/" target="_blank" rel="noopener">NVIDIA</a>)</div>
+            </div>
+
+            <div style="flex:1.35;background:var(--bg-2);border:1px solid var(--line);border-radius:4px;padding:26px 26px;display:flex;flex-direction:column;">
+              <div style="font-size:22px;color:var(--ink-dimmer);text-transform:uppercase;letter-spacing:0.06em;">Rare minerals</div>
+              <div style="display:flex;gap:16px;align-items:flex-start;margin-top:10px;">
+                <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;">
+                  <img src="assets/rare-earth-production.png" alt="Global rare earth oxide production 1950-2000, shifting from the US to China" style="height:150px;width:auto;border-radius:3px;">
+                  <a href="https://commons.wikimedia.org/wiki/File:Rareearth_production.svg" target="_blank" rel="noopener" style="font-size:12px;">Wikipedia</a>
+                </div>
+                <div>
+                  <div class="headline" style="font-size:40px;font-weight:700;color:oklch(0.62 0.21 25);">69% → 90%</div>
+                  <div style="font-size:16px;color:var(--ink-dim);margin-top:5px;line-height:1.35;">China mines 69%, refines ~90%, and makes 94% of magnets (<a href="https://fortune.com/2026/03/11/china-us-rare-earth-processing-critical-minerals/" target="_blank" rel="noopener">Fortune</a>, <a href="https://www.iea.org/commentaries/with-new-export-controls-on-critical-minerals-supply-concentration-risks-become-reality" target="_blank" rel="noopener">IEA</a>)</div>
+                </div>
+              </div>
+              <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:16px;color:var(--ink-dim);line-height:1.35;">Extraction has a cost: <span class="preview-trigger"><span style="color:var(--accent-2);text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;cursor:default;">Baotou's tailings lake</span><span class="preview-img"><img src="uploads/images.jpeg" alt="Baotou tailings lake, where rare-earth processing waste is pumped"></span></span> left residents with elevated cancer rates (<a href="https://www.theguardian.com/world/2025/jun/26/china-rare-earths-baotou-life-metallic-elements" target="_blank" rel="noopener">The Guardian</a>)</div>
+              <div style="margin-top:12px;padding:12px 14px;background:oklch(0.28 0.1 25);border-radius:4px;font-size:15px;color:oklch(0.93 0.02 25);line-height:1.35;"><strong>Harder to solve:</strong> no quick fix — Western refining is years away, and Beijing controls exports.</div>
+            </div>
+
+            <div style="flex:1;background:var(--bg-2);border:1px solid var(--line);border-radius:4px;padding:28px 26px;display:flex;flex-direction:column;">
+              <div style="font-size:22px;color:var(--ink-dimmer);text-transform:uppercase;letter-spacing:0.06em;">Hardware demands</div>
+              <div class="headline" style="font-size:52px;font-weight:700;color:var(--accent);margin-top:12px;">70%</div>
+              <div style="font-size:19px;color:var(--ink-dim);margin-top:8px;line-height:1.4;">of all memory chips now go to data centers, up from ~20–30% in 2022 (<a href="https://tech-insider.org/memory-chip-shortage-2026-ai-consumer-electronics/" target="_blank" rel="noopener">Tech Insider, citing IDC</a>)</div>
+              <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--line);font-size:17px;color:var(--ink-dim);line-height:1.4;">Apple has raised MacBook and iPad prices amid an "unprecedented" memory crunch (<a href="https://www.bbc.com/news/articles/c1dzdndzlxqo" target="_blank" rel="noopener">BBC</a>)</div>
+              <div style="margin-top:14px;padding:12px 14px;background:oklch(0.28 0.08 250);border-radius:4px;font-size:16px;color:oklch(0.92 0.03 250);line-height:1.4;"><strong>My prediction:</strong> temporary — should ease once data-center buildout slows and 2027–28 capacity arrives</div>
+            </div>
+          </div>
+
+          <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--line);display:flex;align-items:flex-start;gap:24px;">
+            <div class="headline" style="font-size:64px;font-weight:700;color:var(--accent-2);line-height:0.5;flex-shrink:0;">"</div>
+            <div style="font-size:25px;color:var(--ink);line-height:1.4;max-width:1580px;"><span class="mono" style="color:var(--accent-2);font-size:15px;letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:5px;">Future of AI &amp; HPC — My prediction</span>Driven by LLM versatility, computing will split into a hybrid HPC-Edge paradigm—reserving high-performance infrastructure for complex research and heavy hosting, while compressed open models handle routine tasks locally. This hybrid framework will drive economic and scientific growth until the next major disruption: <span class="preview-trigger"><span style="color:var(--accent-2);text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;cursor:default;">quantum computing</span><span class="preview-img"><img src="uploads/241031-Arribada-xip-quantic-43-scaled.jpg" alt="Quantum computer dilution refrigerator"></span></span>.</div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+    <aside class="notes" id="notes" aria-live="polite">
+      <h3>Presenter notes</h3>
+      <p id="notesText"></p>
+    </aside>
+    <footer class="footer">
+      <span><span class="kbd">←</span> <span class="kbd">→</span> navigate · <span class="kbd">F</span> fullscreen · <span class="kbd">N</span> notes</span>
+      <span id="slideCount"></span>
+    </footer>
+  </main>
+</div>
+
+<script>
+const slides = Array.from(document.querySelectorAll('.slide'));
+const outline = document.getElementById('outline');
+const bar = document.getElementById('bar');
+const where = document.getElementById('where');
+const notesEl = document.getElementById('notes');
+const notesText = document.getElementById('notesText');
+const clock = document.getElementById('clock');
+const stage = document.getElementById('slides');
+let idx = 0;
+
+slides.forEach((s, i) => {
+  const btn = document.createElement('button');
+  btn.innerHTML = '<span class="n">' + String(i + 1).padStart(2, '0') + '</span><span class="t">' + s.dataset.title + '</span>';
+  btn.addEventListener('click', () => goTo(i));
+  outline.appendChild(btn);
+});
+document.getElementById('slideCount').textContent = slides.length + ' slides';
+
+function goTo(i) {
+  idx = Math.max(0, Math.min(slides.length - 1, i));
+  slides.forEach((s, n) => s.classList.toggle('active', n === idx));
+  Array.from(outline.children).forEach((b, n) => b.classList.toggle('active', n === idx));
+  bar.style.width = ((idx + 1) / slides.length * 100) + '%';
+  where.textContent = 'Slide ' + (idx + 1);
+  notesText.textContent = slides[idx].dataset.notes || 'No notes for this slide.';
+  scaleSlides();
+}
+document.getElementById('prev').addEventListener('click', () => goTo(idx - 1));
+document.getElementById('next').addEventListener('click', () => goTo(idx + 1));
+document.getElementById('notesBtn').addEventListener('click', () => notesEl.classList.toggle('open'));
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') goTo(idx + 1);
+  else if (e.key === 'ArrowLeft') goTo(idx - 1);
+  else if (e.key.toLowerCase() === 'f') { document.documentElement.requestFullscreen?.(); }
+  else if (e.key.toLowerCase() === 'n') notesEl.classList.toggle('open');
+});
+
+function scaleSlides() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  const scale = Math.min(w / 1920, h / 1080);
+  slides.forEach(s => s.style.transform = 'translate(-50%,-50%) scale(' + scale + ')');
+}
+new ResizeObserver(scaleSlides).observe(stage);
+
+let seconds = 0;
+setInterval(() => {
+  seconds++;
+  const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+  const s = String(seconds % 60).padStart(2, '0');
+  clock.textContent = m + ':' + s;
+}, 1000);
+
+goTo(0);
+</script>
+</body>
+</html>
